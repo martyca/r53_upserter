@@ -12,7 +12,7 @@ MANDATORY_ENV_VARS = [
 if 'INTERVAL' in os.environ:
   INTERVAL = os.environ['INTERVAL']
 else:
-  INTERVAL = 300
+  INTERVAL = 900
 
 A_RECORD = os.environ["A_RECORD"]
 
@@ -25,7 +25,7 @@ def poll_result(change_id):
   r53 = boto3.client('route53')
   result = r53.get_change(Id=change_id)['ChangeInfo']
   while result['Status'] == 'PENDING':
-    time.sleep(1)
+    time.sleep(2)
     result = r53.get_change(Id=change_id)['ChangeInfo']
     print(".", end="", flush=True)
   print()
