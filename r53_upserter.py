@@ -14,6 +14,11 @@ if 'INTERVAL' in os.environ:
 else:
   INTERVAL = 900
 
+if 'IP_URL' in os.environ:
+  IP_URL = os.environ['IP_URL']
+else:
+  IP_URL = 'http://icanhazip.com'
+
 A_RECORD = os.environ["A_RECORD"]
 
 for var in MANDATORY_ENV_VARS:
@@ -25,7 +30,9 @@ def poll_result(change_id):
   r53 = boto3.client('route53')
   result = r53.get_change(Id=change_id)['ChangeInfo']
   while result['Status'] == 'PENDING':
-    time.sleep(2)
+    if time.time() - start_time > INTERVAL:
+      raise Exception('Timeout error!')
+    time.sleep(5)
     result = r53.get_change(Id=change_id)['ChangeInfo']
     print(".", end="", flush=True)
   print()
@@ -48,7 +55,7 @@ def generate_change_batch():
           'Name': A_RECORD,
           'ResourceRecords': [
             {
-              'Value': get_ip(),
+              'Value': get_ip(IP_URL),
             },
           ],
           'TTL': 60,
@@ -59,8 +66,14 @@ def generate_change_batch():
   }
   return batch
 
-def get_ip():
-  return urllib.request.urlopen("http://icanhazip.com").read().strip().decode()
+def get_ip(url):
+  try:
+    LOCAL_IP = urllib.request.urlopen(url).read().strip().decode()
+    print("Local IP is \"{}\".".format(LOCAL_IP))
+    return LOCAL_IP
+  except Exception as e:
+    print("Error {0} on {1}".format(e, url))
+    quit()
 
 def get_record_zone_id(): # matches zone to A_RECORD, returns ID
   for zone in get_hosted_zones():
@@ -79,10 +92,12 @@ def get_hosted_zones():
 def main():
   # print(get_caller_id())
   while True:
-    print("{} - Updating record...".format(time.strftime("%H:%M:%S", time.localtime())))
+    print("{} - Updating record \"{}\"...".format(time.strftime("%H:%M:%S", time.localtime()), A_RECORD))
     change_id = upsert_record()['Id'].split('/')[2]
     result = poll_result(change_id)
     print("Status: {0}, Duration: {1} seconds.".format(result[0], result[1]))
+    print("Next cycle in {} seconds...".format(INTERVAL-result[1]))
     time.sleep(INTERVAL-result[1])
+
 if __name__ == "__main__":
   main()
