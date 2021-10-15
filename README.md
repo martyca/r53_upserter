@@ -10,7 +10,7 @@ The script uses 4 environment variables:
 | AWS_SECRET_ACCESS_KEY | required      | Specifies the secret key associated with the access key. This is essentially the "password" for the access key. |
 | A_RECORD              | required      | The a record you wish to create or update, example: record.domain.com |
 | INTERVAL              | optional      | The interval in seconds at which the update occurs, default is 900 seconds, or 15 minutes |
-| IP_URL              | optional      | The url used for determining local IP, defaults to "icanhazip.com", when using alternatives, please ensure the ip returned is IPv4 and only returns a clean octet with no qoutes or "end of line" characters |
+| IP_URL              | optional      | The url used for determining local IP, defaults to "icanhazip.com"|
 
 Set the environment variables in a way that is appropriate for your operating system.
 

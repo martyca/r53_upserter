@@ -2,6 +2,7 @@ import os
 import boto3
 import urllib.request
 import time
+import ipaddress
 
 MANDATORY_ENV_VARS = [
   'AWS_ACCESS_KEY_ID',
@@ -69,6 +70,7 @@ def generate_change_batch():
 def get_ip(url):
   try:
     LOCAL_IP = urllib.request.urlopen(url).read().strip().decode()
+    ipaddress.IPv4Address(LOCAL_IP) # Validate IP
     print("Local IP is \"{}\".".format(LOCAL_IP))
     return LOCAL_IP
   except Exception as e:
