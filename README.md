@@ -40,6 +40,7 @@ docker build -t r53_upserter .
 ```
 ### Premade docker image
 This docker image is prebuild and available on duckerhub.
+https://hub.docker.com/repository/docker/martyca/r53_upserter
 Pull from dockerhub:
 ```shell
 docker pull martyca/r53_upserter
@@ -52,5 +53,6 @@ Run the container setting the required environment variables:
   -e AWS_ACCESS_KEY_ID\
   -e AWS_SECRET_ACCESS_KEY\
   -e INTERVAL\
+  -e IP_URL \
   martyca/r53_upserter
  ```
